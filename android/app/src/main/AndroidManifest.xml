@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Se delega la captura en la app de cámara. No se accede directamente al sensor. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <queries><intent><action android:name="android.media.action.IMAGE_CAPTURE" /></intent></queries>
+    <application android:label="CivilRaíz Color" android:icon="@drawable/ic_civil"
+        android:theme="@style/AppTheme" android:allowBackup="false" android:usesCleartextTraffic="false">
+        <activity android:name=".MainActivity" android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <provider android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.photos" android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/photo_paths" />
+        </provider>
+    </application>
+</manifest>
