@@ -1,0 +1,56 @@
+name: Compilar APK CivilRaiz
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compilar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Descargar el proyecto
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Preparar Android
+        uses: android-actions/setup-android@v3
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Instalar las herramientas de Android
+        run: sdkmanager "platforms;android-35" "build-tools;34.0.0"
+
+      - name: Comprobar los calculos
+        run: node web/tests/core.test.js
+
+      - name: Copiar la interfaz al proyecto Android
+        run: |
+          mkdir -p android/app/src/main/assets
+          cp -R web/. android/app/src/main/assets/
+
+      - name: Compilar y revisar la aplicacion
+        run: gradle -p android assembleDebug lintDebug --no-daemon --stacktrace
+
+      - name: Guardar el APK descargable
+        uses: actions/upload-artifact@v4
+        with:
+          name: CivilRaiz-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
